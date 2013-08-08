@@ -4,13 +4,15 @@ using namespace std;
 
 int pos(string s, char c){
   for(int i=0; i<s.length(); i++)
-    if(s.at(i)==c) then return i;
+    if(s.at(i)==c){
+      return i;
+    }
   
   return -1;
 }
 
 string sub(string s, int c){
-  return s.substring(pos(s,c),s.length());
+  return s.substr(c+1,s.length());
 }
 
 string after(string s, char c){
