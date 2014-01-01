@@ -1,1 +1,25 @@
 Actual Entity
+---------------
+Actual Entity is a game for assigning names to yourself or others.
+
+The name file is set up in a _continuous_ set of names, with a category listed before it with a comma. This is an acceptable name file:
+
+male:Jack
+female:Jill
+last:Johnson
+
+However, if you were to have a new line in between female and last it would break execution and just use the male and female names. This is to allow prototype names and comments at the bottom of the file. Also note that the strings are interpretted raw, without sanitization. Spaces will be left in for this reason.
+
+Author:
+---------
+Exocom
+
+License:
+---------
+GNU GPL v2, see LICENSE file.
+
+Installation:
+-------------
+To install locally, run make to create the executable. make clean will just remove the object files.
+
+make clean install as root will move the executable to your /usr/bin directory, which every sane man has in their path. To be able to call it from a shell, this is recommended.

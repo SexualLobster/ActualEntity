@@ -1,94 +1,60 @@
-#include <string>
 #include <iostream>
-#include <fstream>
-#include <vector>
 #include <cstdlib>
-#include <ctime>
-#include <iomanip>
+#include <vector>
+#include <fstream>
+#include "strings.cpp"
+#define NAMEFILE "./names.txt"
+#define TRIM (after(buffer,':'))
 
-#define MNAMES	5
-#define FNAMES	5
-#define LNAMES	5
+//Define global variables
+vector<string> femaleNames;
+vector<string> maleNames;
+vector<string> lastNames;
 
-using namespace std;
-
+/*
+//!Return number between floor and ceiling
+int ranNum(int floor, int ceiling)
+{
+	return (floor + (rand()%ceiling)) - 1;
+}
+*/
 int ranNum(int min, int max)
 {
-	return (rand() % (max - min + 1)) + min;
+        return (rand() % (max - min + 1)) + min;
 }
 
-string maleName()
-{
-	ifstream infile("maleNames.txt");
-	if (!infile)
-	{
-		cout << "Could not open file: maleNames.txt" << endl;
-		return "Fatal Error";
-	}
-	vector<string> lines;
-	string line;
-	unsigned int lineNo = 1;
-	lineNo = ranNum(1, MNAMES);
-	while (lineNo != 0)
-	{
-		getline(infile, line);
-		lines.push_back(line);
-		lineNo--;
-	}
-	if (line == "")
-	{
-		cout << "Error: Could not get male first name." << endl;
-	}
-	infile.close();
-	return line;
+
+void loadNames(){
+  string buffer;
+  ifstream in(NAMEFILE);
+
+  
+  
+  for(int i = 0; getline(in,buffer); i++){
+    if(buffer.find("female")!=-1)
+      femaleNames.push_back(TRIM);
+    else if(buffer.find("male")!=-1)
+      maleNames.push_back(TRIM);
+    else if(buffer.find("last:")!=-1)
+      lastNames.push_back(TRIM);
+    else break;
+  }
 }
-string femaleName()
-{
-	ifstream infile("femaleNames.txt");
-	if (!infile)
-	{
-		cout << "Could not open file: femaleNames.txt" << endl;
-		return "Fatal Error";
-	}
-	vector<string> lines;
-	string line;
-	unsigned int lineNo = 1;
-	lineNo = ranNum(1, FNAMES);
-	while (lineNo != 0)
-	{
-		getline(infile, line);
-		lines.push_back(line);
-		lineNo--;
-	}
-	if (line == "")
-	{
-		cout << "Error: Could not get female first name." << endl;
-	}
-	infile.close();
-	return line;
-}
-string lastName()
-{
-	ifstream infile("lastNames.txt");
-	if (!infile)
-	{
-		cout << "Could not open file: lastNames.txt" << endl;
-		return "Fatal Error";
-	}
-	vector<string> lines;
-	string line;
-	unsigned int lineNo = 1;
-	lineNo = ranNum(1, LNAMES);
-	while (lineNo != 0)
-	{
-		getline(infile, line);
-		lines.push_back(line);
-		lineNo--;
-	}
-	if (line == "")
-	{
-		cout << "Error: Could not get last name." << endl;
-	}
-	infile.close();
-	return line;
+
+string name(unsigned int t){
+  loadNames();
+  switch(t){
+    case 0:
+      //return maleNames[(ranNum(1,maleNames.capacity()))];
+        return maleNames[(ranNum(1,maleNames.size()))];
+    case 1:
+      //return femaleNames[(ranNum(1,femaleNames.capacity()))];
+        return femaleNames[(ranNum(1,femaleNames.size()))];
+    case 2:
+      //return lastNames[(ranNum(1,lastNames.capacity()))];
+        return lastNames[(ranNum(1,lastNames.size()))];
+    default:
+      break;
+    }
+  return "";
 }

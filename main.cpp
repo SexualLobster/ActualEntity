@@ -1,46 +1,67 @@
-#include "iostream"
+#include <iostream>
 #include <ctime>
 #include <cstdlib>
-#include "game.h"
-
+#include "game.cpp"
+#include <cstring>
 using namespace std;
 
-int info(void)
+typedef int (*function)(int,char**);
+
+struct cLinePair
 {
-	cout << "Actual Entity is Copyright 2011-2013 Exocom\n";
+    function f;
+    string name;
+
+    cLinePair(function c, string n)
+    {
+        f = c;
+        name = n;
+    }
+};
+
+vector<cLinePair> cLinePairs;
+
+int info(int argc, char** argv)
+{
+    cout << "Copyright 2011-2014 Exocom" << endl;
 }
 
-int help(void)
+int version(int argc, char** argv)
 {
-	cout << "Please consult the readme.txt that should have came with AE\n";
+    cout << "Pre Alpha" << endl;
 }
 
-int main()
+int test(int argc, char** argv)
 {
-	srand(time(NULL));
-	cout << "Welcome to Actual Entity!\n";
-	string menuChoice = "";
-	bool playing = true;
-	while (playing == true)
-	{
-		cout << ">Game\n>Info\n>Help\n>Quit\n";
-		getline(cin, menuChoice);
-		if (menuChoice == "info")
-		{
-			info();
-		}
-		if (menuChoice == "help")
-		{
-			help();
-		}
-		if (menuChoice == "game")
-		{
-			playing = game();
-		}
-		if (menuChoice == "quit")
-		{
-			playing = false;
-		}
-	}
-	return 0;
+    cout << "test" << endl;
+}
+void initializeCLinePairs()
+{
+    cLinePairs.push_back(cLinePair(&info, "info"));
+    //cLinePairs.push_back(cLinePair(&test, "test"));
+    cLinePairs.push_back(cLinePair(&version, "version"));
+    cLinePairs.push_back(cLinePair(&game, "game"));
+    //cLinePairs.push_back(cLinePair(&game, ""));
+}
+
+void handleArgs(int argc, char** argv)
+{
+    for(int all = 1; all < argc; all++)
+    {
+        for(int i = 0; i < cLinePairs.capacity()-1; i++)
+        {
+            if(strcmp(cLinePairs[i].name.c_str(),argv[all])==0)
+            {
+                cLinePairs[i].f(argc,argv);
+            }
+        }
+    }
+}
+
+int main(int argc, char** argv)
+{
+    srand(time(NULL));
+    initializeCLinePairs();
+    handleArgs(argc,argv);
+    return 0;
 }
