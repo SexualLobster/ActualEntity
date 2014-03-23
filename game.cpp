@@ -26,11 +26,20 @@ int game(int argc, char** argv)
 		int grade;
 		int schoolState; // 0 = no school, 1 = in school, 2 = highschool grad, 3 = in college, 4 = college grad
 
-		//int familyMoney = 0;
+		int boardingState; // 0 = living with parents, 1 independent (includes homeless), 2 shared (room mates, spouse)
+
+		bool employed;
+		string jobTitle;
+		unsigned int salary;
+
+		int houseMoney;
+		int personelMoney;
+		int bills;
 
 
+		//void getJob()
 
-		void printStats()
+		void printStats() //Prints information; For selected character; Used for debugging
 		{
 			cout << "First name:\t" << fName << "." << endl;
 			cout << "Last name:\t" << lName << "." << endl;
@@ -38,42 +47,82 @@ int game(int argc, char** argv)
 			cout << "Age:\t\t" << age << "." << endl;
 			cout << "Death age:\t" << deathAge << "." << endl;
 			cout << "Intel:\t\t" << intel << "." << endl;
+			if (employed == 0)
+			{
+				cout << "Unemployed." << endl;
+			}
+			else
+			{
+				cout << jobTitle << " at" << salary << "." << endl;
+			}
 		}
 	};
 
+	//Declares essential people.
 	Person cPlayer;
 	Person cMother;
 	Person cFather;
 
+	//Makes sure essential people are alive.
+	cPlayer.alive = true;
+	cMother.alive = true;
+	cFather.alive = true;
+
+	//Generated Mom/Dad lifespan, along with player character.
 	cMother.hereditaryLifespan = ranNum(-20, 20);
 	cFather.hereditaryLifespan = ranNum(-20, 20);
 	cPlayer.hereditaryLifespan = (cFather.hereditaryLifespan + cMother.hereditaryLifespan) / 2;
 
+	//Sets mother/father age.
 	cMother.age = ranNum(18, 45); // Old floor/ceiling is 40/61
 	cFather.age = ranNum((cMother.age / 2 + 7), 55);
+	
+	//Gender
+	cMother.gender = 1;
+	cFather.gender = 0;
+	cPlayer.gender = ranNum(0, 1); //Zero for male, One for female
+
+	//Names
+	cFather.fName = name(0);
+	cMother.fName = name(1);
 	cFather.lName = name(2);
 	cMother.lName = cFather.lName; //TODO: Skanks!
-	cPlayer.gender = ranNum(0, 1); //Zero for male, One for female
 	cPlayer.lName = cFather.lName;
 	cPlayer.fName = name(cPlayer.gender);
 
-	cFather.intel = ranNum(20, 80);
-	cMother.intel = ranNum(20, 80);
-	cPlayer.intel = (cFather.intel + cMother.intel) / 2;
-	
-	cMother.deathAge = (50 + cMother.hereditaryLifespan);
-	cFather.deathAge = (45 + cFather.hereditaryLifespan);
-	
+	//Intelligence, which is totally hereditary.
+	cFather.intel = ranNum(40, 90);
+	cMother.intel = ranNum(40, 90);
+	if (ranNum(0, 5) == 3) //Gotta have some gains. 1/5th chance of dad having +10 extra intelligence.
+		{
+			cFather.intel = cFather.intel + 10;
+			if (ranNum(0,10) == 6) //1/10th chance of mom having +10 intelligence
+			{
+				cMother.intel = cMother.intel + 10;
+				if (ranNum(0, 20) == 13) //1/20th chance of both parents being super smart. Ceiling: 125.
+				{
+					cMother.intel = cMother.intel + 15;
+					cFather.intel = cFather.intel +15;
+				}
+			}
+		}
+	cPlayer.intel = (cFather.intel + cMother.intel) / 2; //TODO #8, mental retardation.
+
+	//Fun small stuff
+
+	//Death age.
+	cMother.deathAge = (80 + cMother.hereditaryLifespan);
+	cFather.deathAge = (75 + cFather.hereditaryLifespan);	
 	//Too lazy to implement otherwise.
 	//cPlayer.gender--;
 	cPlayer.deathAge = (75 + (5 * cPlayer.gender)) - cPlayer.hereditaryLifespan; 
 	//cPlayer.gender++; //^If you are a female, you get 5 more years on average
+	
 	cPlayer.age = 0;
-
 	int cmdCount = 0;
 	string cmd = "";
 	cout << "You are " << cPlayer.fName << " " << cPlayer.lName << "." << endl;
-	while (cPlayer.alive == true)
+	while (cPlayer.alive == true) //Main game loop.
 	{
 		if (cPlayer.age == SCHOOL_GRAD_AGE)
 		{
@@ -90,16 +139,20 @@ int game(int argc, char** argv)
 
 
 		getline(cin, cmd);
-		if (cmd == "age a year")
+		if (cmd == "age a year" || cmd == "age")
 		{
+			//cMother.alive = true;
+			//cFather.alive = true;
 			cPlayer.age++;
 			if (cMother.alive == true)
 			{
 				cMother.age++;
+				cout << "Your mother, " << cMother.fName << ", is now " << cMother.age << "." << endl;
 			}
 			if (cFather.alive == true)
 			{
 				cFather.age++;
+				cout << "Your father, " << cFather.fName << ", is now " << cFather.age << "." << endl;
 			}
 			cout << "You are now " << cPlayer.age << " years old." << endl;
 
@@ -117,19 +170,25 @@ int game(int argc, char** argv)
 				}
 			}
 
-			if (cMother.age == cMother.deathAge)
+			if (cMother.age == cMother.deathAge && cMother.alive == true)
 			{
 				cout << "Your mother died at age " << cMother.age << ". That sucks." << endl;
+				cMother.alive = false;
 			}
-			if (cFather.age == cFather.deathAge)
+			if (cFather.age == cFather.deathAge && cFather.alive == true)
 			{
 				cout << "Your father died at age " << cFather.age << ". That sucks." << endl;
+				cFather.alive = false;
 			}
 			if (cPlayer.age == cPlayer.deathAge)
 			{
 				cPlayer.alive = false;
 			}
 			cmdCount = 0;
+			if (cPlayer.boardingState == 0)
+			{
+				cPlayer.houseMoney = cPlayer.houseMoney - cPlayer.bills;
+			}
 		}
 		if (cmd == "study")
 		{
@@ -167,6 +226,10 @@ int game(int argc, char** argv)
 		if (cmd == "show dad stats")
 		{
 			cFather.printStats();
+		}
+		if (cmd == "getajob")
+		{
+			getJob(cPlayer.jobTitle, cPlayer.salary);
 		}
 		if (cmdCount == MAX_CMD)
 		{
